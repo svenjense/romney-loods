@@ -22,7 +22,7 @@ const FLOOR_TYPES = {
 };
 const DEFAULT_PARAMS = { length: 13, width: 6, wallH: 1.0, door: 60, opacity: 100, clip: 0, lichtstraat: 1.2,
   office: true, officeW: 3.0, officeD: 3.5, officeH: 2.6, officeSide: 'links',
-  site: true, siteE: 0.2, siteN: 19.9, siteRot: 37,
+  site: true, siteE: -3.5, siteN: 23.5, siteRot: 34,
   oaks: [[14, 38], [20, 33], [23.5, 24], [27.5, 15]] };
 
 function examplePreset() {
@@ -176,6 +176,7 @@ const building = new THREE.Group(); loods.add(building);
 const itemsGroup = new THREE.Group(); loods.add(itemsGroup);
 const site = new THREE.Group(); scene.add(site);
 let siteData = null, siteBuilt = false, orthoMesh = null; const oakMeshes = [], dataTrees = [];
+let lastCentre = null;
 scene.add(sun.target);
 let surfaces = { shell: [], back: null, front: null };
 let door = { group: null, cables: [], anchors: [], plateH: 0, plateW: 0, angle: 0 };
@@ -436,11 +437,22 @@ function applyClip() {
   if (P().clip > 0) { loods.updateMatrixWorld(true); clipPlane.set(new THREE.Vector3(1, 0, 0), -P().clip).applyMatrix4(loods.matrixWorld); }
   else clipPlane.set(new THREE.Vector3(1, 0, 0), 1000);
 }
+function loodsCentre() {
+  loods.updateMatrixWorld(true);
+  return loods.localToWorld(new THREE.Vector3(P().length / 2, 0, 0));
+}
 function applyPlacement() {
   const on = !!P().site;
   if (on) { loods.position.set(P().siteE, 0, -P().siteN); loods.rotation.y = THREE.MathUtils.degToRad(P().siteRot); }
   else { loods.position.set(0, 0, 0); loods.rotation.y = 0; }
   loods.updateMatrixWorld(true);
+  // de camera volgt de loods: kijkrichting en afstand blijven, het midden blijft de loods
+  const c = loodsCentre();
+  if (lastCentre) {
+    const d = c.clone().sub(lastCentre);
+    if (d.lengthSq() > 1e-9) { camera.position.add(d); controls.target.add(d); controls.update(); }
+  }
+  lastCentre = c;
   site.visible = on; ground.visible = !on;
   if (on && !siteBuilt && siteData) buildSite();
   placeOaks();
@@ -712,7 +724,7 @@ function setCam(name) {
     kantoor: [[P().officeD + 2.6, 1.7, oz * 0.6], [0.8, 1.3, oz]],
     boven: [[L / 2, 24, 0.01], [L / 2, 0, 0]],
   };
-  views.terrein = [[-28, 22, -22], [L / 2, 1, 0]];
+  views.terrein = [[-22, 16, 18], [L / 2, 2, 0]];
   loods.updateMatrixWorld(true);
   if (name === 'boven') {
     // recht van boven, noorden boven, ruim genoeg voor de loods en de vier eiken
@@ -722,10 +734,11 @@ function setCam(name) {
     const c = box.getCenter(new THREE.Vector3()), sz = box.getSize(new THREE.Vector3());
     const span = Math.max(sz.x, sz.z, sz.x / camera.aspect);
     const hgt = (span / 2) / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.1;
-    camera.position.set(c.x, hgt, c.z + 0.02); controls.target.set(c.x, 0, c.z); controls.update(); return;
+    camera.position.set(c.x, hgt, c.z + 0.02); controls.target.set(c.x, 0, c.z); controls.update(); lastCentre = loodsCentre(); return;
   }
   const [p, t] = views[name] || views.buiten;
   camera.position.copy(loods.localToWorld(new THREE.Vector3(...p))); controls.target.copy(loods.localToWorld(new THREE.Vector3(...t))); controls.update();
+  lastCentre = loodsCentre();
 }
 
 // ---------------------------------------------------------------- opslag

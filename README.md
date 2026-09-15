@@ -13,10 +13,13 @@ De loods staat op het terrein **noordwest van het Poortgebouw** (Tolhuisweg 2, A
 in lijn met het gebouw (53,5°, dezelfde richting als de gevel). Voorgevel met takelplaat naar het zuidwesten,
 richting het Poortgebouw en de oprit.
 
-De plek is overgenomen uit een op Google Maps aangetekende rechthoek. Die is op de luchtfoto vastgepind door de
-OpenStreetMap-omtrek van het Poortgebouw over de schermafbeelding te leggen (schaalbalk 112 px = 10 m); midden van
-de rechthoek op 5,4 m oost / 23,8 m noord van de ingang van Tolhuisweg 2, wat overeenkomt met
-`siteE 0.2 · siteN 19.9 · siteRot 37` (positie van de voorgevel).
+De plek komt uit een op Google Maps aangetekende rechthoek, daarna met de hand bijgeschoven. Die aantekening is op
+de luchtfoto vastgepind door de OpenStreetMap-omtrek van het Poortgebouw over de schermafbeelding te leggen
+(schaalbalk 112 px = 10 m). Huidige stand: `siteE -3.5 · siteN 23.5 · siteRot 34`, dat is de voorgevel; het midden
+van de loods ligt daarmee op 1,9 m oost / 27,1 m noord van de ingang van Tolhuisweg 2.
+
+De camera blijft op de loods gericht: verschuif of draai je hem met de sliders, dan schuift het draaipunt van de
+camera mee, zodat hij niet uit beeld loopt.
 
 Omgeving uit open data:
 
