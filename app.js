@@ -750,11 +750,12 @@ function refreshLayoutList() {
   for (const n of Object.keys(loadLayouts())) { const o = document.createElement('option'); o.value = o.textContent = n; sel.appendChild(o); }
 }
 function applyState(s) {
+  const savedV = (s.params || {}).v;
   state = { params: { ...DEFAULT_PARAMS, ...(s.params || {}) }, items: (s.items || []).map(i => ({ ...i })) };
   if (!Array.isArray(state.params.oaks) || state.params.oaks.length !== 4) state.params.oaks = DEFAULT_PARAMS.oaks.map(o => [...o]);
   state.params.oaks = state.params.oaks.map(o => [...o]);
   // opslag uit een oudere versie: plek van de loods en de eiken zijn sindsdien gecorrigeerd
-  if (state.params.v !== DEFAULT_PARAMS.v) Object.assign(state.params, {
+  if (savedV !== DEFAULT_PARAMS.v) Object.assign(state.params, {
     v: DEFAULT_PARAMS.v, siteE: DEFAULT_PARAMS.siteE, siteN: DEFAULT_PARAMS.siteN,
     siteRot: DEFAULT_PARAMS.siteRot, oaks: DEFAULT_PARAMS.oaks.map(o => [...o]),
   });
