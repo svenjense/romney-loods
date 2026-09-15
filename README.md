@@ -30,5 +30,12 @@ Omgeving uit open data:
 Coördinaten in `site.json` zijn meters oost/noord vanaf de ingang van Tolhuisweg 2 (OSM-node 2627538185, 52.38411 N 4.90573 E).
 
 De vier moeraseiken staan in geen enkel bestand: het bomenbestand van de gemeente kent binnen 400 m geen enkele
-Quercus palustris, dus ze staan op particulier terrein. Hun plaats in het model is van de winterluchtfoto afgelezen
-(bladerloos, kronen apart zichtbaar) en dus een benadering; ze zijn versleepbaar, het handigst in het bovenaanzicht.
+Quercus palustris, dus ze staan op particulier terrein. Hun plaats komt uit een schermafbeelding waarop de kruinen
+met witte stippen zijn aangewezen. Die zijn omgerekend door de camera van dat beeld terug te rekenen uit zes
+bekende punten in het model (de twee gebouwlabels en de vier boomlabels, restfout 0,7 px) en de stippen daarna
+terug te projecteren op de hoogte van het kruinmidden (11 m). Resultaat: een rij op 22,6 tot 34,2 m noord,
+hart op hart 7,2 tot 7,8 m, richting 55 tot 64 graden, dus vrijwel evenwijdig aan de loods. Ze blijven versleepbaar.
+
+`params.v` in de opgeslagen indeling merkt opslag uit een oudere versie: staat die op een ouder nummer, dan nemen
+de plaats van de loods en de vier eiken de nieuwe waarden over. Zonder dat blijft een browser de oude posities
+tonen, want opgeslagen waarden gaan voor op de standaardwaarden.

@@ -22,8 +22,8 @@ const FLOOR_TYPES = {
 };
 const DEFAULT_PARAMS = { length: 13, width: 6, wallH: 1.0, door: 60, opacity: 100, clip: 0, lichtstraat: 1.2,
   office: true, officeW: 3.0, officeD: 3.5, officeH: 2.6, officeSide: 'links',
-  site: true, siteE: -3.5, siteN: 23.5, siteRot: 34,
-  oaks: [[14, 38], [20, 33], [23.5, 24], [27.5, 15]] };
+  site: true, siteE: -3.5, siteN: 23.5, siteRot: 34, v: 3,
+  oaks: [[-13.9, 22.6], [-7.5, 27.0], [-1.4, 30.9], [5.3, 34.2]] };
 
 function examplePreset() {
   const items = [];
@@ -753,6 +753,11 @@ function applyState(s) {
   state = { params: { ...DEFAULT_PARAMS, ...(s.params || {}) }, items: (s.items || []).map(i => ({ ...i })) };
   if (!Array.isArray(state.params.oaks) || state.params.oaks.length !== 4) state.params.oaks = DEFAULT_PARAMS.oaks.map(o => [...o]);
   state.params.oaks = state.params.oaks.map(o => [...o]);
+  // opslag uit een oudere versie: plek van de loods en de eiken zijn sindsdien gecorrigeerd
+  if (state.params.v !== DEFAULT_PARAMS.v) Object.assign(state.params, {
+    v: DEFAULT_PARAMS.v, siteE: DEFAULT_PARAMS.siteE, siteN: DEFAULT_PARAMS.siteN,
+    siteRot: DEFAULT_PARAMS.siteRot, oaks: DEFAULT_PARAMS.oaks.map(o => [...o]),
+  });
   selectedId = null; syncUI(); buildBuilding(); rebuildItems(); save();
 }
 function hint(t) { $('hint').textContent = t; }
