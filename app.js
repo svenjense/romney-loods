@@ -39,7 +39,7 @@ function examplePreset() {
   p('clt', 'back', -1.3, 0.8);
   p('clt', 'back', 1.3, 0.8);
   p('clt', 'back', 0, 2.1);
-  f('cltstaand', 10.0, -0.6, 0.5);
+  f('cltstaand', 8.6, 2.0, 0.15);
   f('werkbank', 11.8, -2.2, 0);
   f('stelling', 11.6, 2.3, 0);
   f('tafel', 7.0, 0.6, 0);
@@ -72,7 +72,7 @@ const TEX = {
   corrugated: canvasTex(256, (ctx, s) => {
     for (let x = 0; x < s; x++) {
       const v = 0.5 + 0.5 * Math.sin((x / s) * Math.PI * 2 * 8);
-      const g = Math.round(140 + 70 * v);
+      const g = Math.round(165 + 60 * v);
       ctx.fillStyle = `rgb(${g},${g + 3},${g + 7})`; ctx.fillRect(x, 0, 1, s);
     }
     noise(ctx, s, 800, 0.08);
@@ -116,8 +116,8 @@ const TEX = {
 function clone(tex, rx, ry) { const t = tex.clone(); t.repeat.set(rx, ry); t.needsUpdate = true; return t; }
 
 const MAT = {
-  shell: new THREE.MeshStandardMaterial({ map: TEX.corrugated, side: THREE.DoubleSide, metalness: 0.45, roughness: 0.55, transparent: true }),
-  gable: new THREE.MeshStandardMaterial({ map: TEX.corrugated, side: THREE.DoubleSide, metalness: 0.45, roughness: 0.55, transparent: true }),
+  shell: new THREE.MeshStandardMaterial({ map: TEX.corrugated, side: THREE.DoubleSide, metalness: 0.15, roughness: 0.6, transparent: true }),
+  gable: new THREE.MeshStandardMaterial({ map: TEX.corrugated, side: THREE.DoubleSide, metalness: 0.15, roughness: 0.6, transparent: true }),
   rib: new THREE.MeshStandardMaterial({ color: 0x3f4a55, metalness: 0.6, roughness: 0.4 }),
   plate: new THREE.MeshStandardMaterial({ color: 0x8e979f, metalness: 0.75, roughness: 0.35, side: THREE.DoubleSide }),
   steel: new THREE.MeshStandardMaterial({ color: 0x555d66, metalness: 0.7, roughness: 0.4 }),
@@ -153,7 +153,7 @@ const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 400);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; controls.maxPolarAngle = Math.PI / 2 - 0.01; controls.minDistance = 0.5; controls.maxDistance = 80;
 
-scene.add(new THREE.HemisphereLight(0xffffff, 0x5a6b3a, 0.75));
+scene.add(new THREE.HemisphereLight(0xffffff, 0x5a6b3a, 1.1));
 const sun = new THREE.DirectionalLight(0xfff4e0, 1.7);
 sun.position.set(-10, 18, 12); sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
@@ -289,7 +289,7 @@ function buildBuilding() {
     } else {
       const g = new THREE.Mesh(new THREE.BoxGeometry(0.03, hh, w), MAT.glass); g.position.set(0, y0 + hh / 2, z0 + w / 2); building.add(g);
       const f = new THREE.Mesh(new THREE.BoxGeometry(0.05, hh + 0.08, w + 0.08), MAT.frame); f.position.copy(g.position);
-      building.add(new THREE.LineSegments(new THREE.EdgesGeometry(f.geometry), MAT.cable)).position.copy(g.position);
+      const edges = new THREE.LineSegments(new THREE.EdgesGeometry(f.geometry), MAT.cable); edges.position.copy(g.position); building.add(edges);
       const bar = new THREE.Mesh(new THREE.BoxGeometry(0.05, hh, 0.04), MAT.frame); bar.position.copy(g.position); building.add(bar);
       const bar2 = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.04, w), MAT.frame); bar2.position.copy(g.position); building.add(bar2);
     }
@@ -473,7 +473,10 @@ function placeMesh(m, it) {
     const basis = new THREE.Matrix4().makeBasis(X, Y, Z);
     m.quaternion.setFromRotationMatrix(basis);
     if (it.rot) m.rotateZ(Math.PI / 2);
-    m.position.copy(s.pos).addScaledVector(Z, th / 2 + 0.015);
+    // op de boogwand: paneel iets vrij van de wand hangen (op regels), zodat de vlakke plaat niet door de kromming steekt
+    let inset = th / 2 + 0.015;
+    if (it.surface === 'shell') { const R = P().width / 2, ph = (it.rot ? it.w : it.h) / 2; inset += 0.02 + (R - Math.sqrt(Math.max(0, R * R - ph * ph))); }
+    m.position.copy(s.pos).addScaledVector(Z, inset);
   } else {
     m.position.set(it.x, 0, it.z); m.rotation.y = it.rot;
   }
