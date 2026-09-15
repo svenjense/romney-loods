@@ -22,8 +22,8 @@ const FLOOR_TYPES = {
 };
 const DEFAULT_PARAMS = { length: 13, width: 6, wallH: 1.0, door: 60, opacity: 100, clip: 0, lichtstraat: 1.2,
   office: true, officeW: 3.0, officeD: 3.5, officeH: 2.6, officeSide: 'links',
-  site: true, siteE: -3.5, siteN: 23.5, siteRot: 34, v: 3,
-  oaks: [[-13.9, 22.6], [-7.5, 27.0], [-1.4, 30.9], [5.3, 34.2]] };
+  site: true, siteE: -3.5, siteN: 23.5, siteRot: 34, v: 4,
+  oaks: [[-20.9, 25.3], [-13.4, 30.4], [-7.2, 35.4], [-0.1, 40.4]] };
 
 function examplePreset() {
   const items = [];

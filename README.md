@@ -30,11 +30,15 @@ Omgeving uit open data:
 Coördinaten in `site.json` zijn meters oost/noord vanaf de ingang van Tolhuisweg 2 (OSM-node 2627538185, 52.38411 N 4.90573 E).
 
 De vier moeraseiken staan in geen enkel bestand: het bomenbestand van de gemeente kent binnen 400 m geen enkele
-Quercus palustris, dus ze staan op particulier terrein. Hun plaats komt uit een schermafbeelding waarop de kruinen
-met witte stippen zijn aangewezen. Die zijn omgerekend door de camera van dat beeld terug te rekenen uit zes
-bekende punten in het model (de twee gebouwlabels en de vier boomlabels, restfout 0,7 px) en de stippen daarna
-terug te projecteren op de hoogte van het kruinmidden (11 m). Resultaat: een rij op 22,6 tot 34,2 m noord,
-hart op hart 7,2 tot 7,8 m, richting 55 tot 64 graden, dus vrijwel evenwijdig aan de loods. Ze blijven versleepbaar.
+Quercus palustris, dus ze staan op particulier terrein. Ze staan op de rij bomen langs het water: vier
+posities uit het bomenbestand zelf, op 25,3 / 30,4 / 35,4 / 40,4 m noord, hart op hart 8,0 tot 9,1 m, en alle vier
+op ongeveer 23 m van de hartlijn van het Buiksloterkanaal, dus evenwijdig aan de oever. Een geregistreerde boom die
+binnen 4,5 m van een moeraseik valt wordt niet dubbel getekend. Ze blijven versleepbaar.
+
+De eerdere poging plaatste ze dichter bij de loods, uit een schermafbeelding waarop de kruinen met witte stippen
+waren aangewezen: de camera van dat beeld is teruggerekend uit zes bekende punten (twee gebouwlabels, vier
+boomlabels, restfout 0,7 px) en de stippen zijn teruggeprojecteerd op de hoogte van het kruinmidden. Dat leverde
+dezelfde rijrichting op, maar 7 tot 8 m te dicht bij de loods.
 
 `params.v` in de opgeslagen indeling merkt opslag uit een oudere versie: staat die op een ouder nummer, dan nemen
 de plaats van de loods en de vier eiken de nieuwe waarden over. Zonder dat blijft een browser de oude posities
