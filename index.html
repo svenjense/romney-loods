@@ -60,6 +60,7 @@
       <button data-cam="binnen">Binnen</button>
       <button data-cam="kantoor">Kantoor</button>
       <button data-cam="boven">Boven</button>
+      <button data-cam="terrein">Terrein</button>
     </div>
     <div class="row"><label>Dak doorzichtig</label><input type="range" id="opacity" min="0" max="100" value="100"><span class="val" id="opacityV">100%</span></div>
     <div class="row"><label>Doorsnede</label><input type="range" id="clip" min="0" max="13" step="0.1" value="0"><span class="val" id="clipV">uit</span></div>
@@ -77,7 +78,17 @@
     <div class="row"><label>Lengte</label><input type="range" id="length" min="6" max="24" step="0.5" value="13"><span class="val" id="lengthV">13 m</span></div>
     <div class="row"><label>Breedte</label><input type="range" id="width" min="4" max="10" step="0.5" value="6"><span class="val" id="widthV">6 m</span></div>
     <div class="row"><label>Rechte wand</label><input type="range" id="wallH" min="0" max="2" step="0.1" value="1"><span class="val" id="wallHV">1.0 m</span></div>
-    <p class="note">Nokhoogte = rechte wand + halve breedte.</p>
+    <div class="row"><label>Lichtstraat</label><input type="range" id="lichtstraat" min="0" max="3" step="0.1" value="1.2"><span class="val" id="lichtstraatV">1.2 m</span></div>
+    <p class="note">Nokhoogte = rechte wand + halve breedte. De lichtstraat loopt over de nok, 1 m vrij van beide kopgevels.</p>
+  </details>
+
+  <details open>
+    <summary>Locatie: Tolhuisweg 2</summary>
+    <div class="row"><label>Omgeving</label><input type="checkbox" id="site" checked> <button id="sitePreset">Op de parkeerplaats</button></div>
+    <div class="row"><label>Oost / west</label><input type="range" id="siteE" min="-60" max="60" step="0.5" value="1.5"><span class="val" id="siteEV">1.5 m</span></div>
+    <div class="row"><label>Noord / zuid</label><input type="range" id="siteN" min="-70" max="50" step="0.5" value="-20"><span class="val" id="siteNV">-20 m</span></div>
+    <div class="row"><label>Draaiing</label><input type="range" id="siteRot" min="-180" max="180" step="1" value="-54"><span class="val" id="siteRotV">-54°</span></div>
+    <p class="note">Luchtfoto en gebouwomtrekken van de echte plek (PDOK luchtfoto CC BY 4.0, gebouwen OpenStreetMap, bomen gemeente Amsterdam). De vier moeraseiken zijn versleepbaar: tik en sleep. Afstanden vanaf de ingang van Tolhuisweg 2.</p>
   </details>
 
   <details open>
