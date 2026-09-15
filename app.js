@@ -22,8 +22,8 @@ const FLOOR_TYPES = {
 };
 const DEFAULT_PARAMS = { length: 13, width: 6, wallH: 1.0, door: 60, opacity: 100, clip: 0, lichtstraat: 1.2,
   office: true, officeW: 3.0, officeD: 3.5, officeH: 2.6, officeSide: 'links',
-  site: true, siteE: 1.5, siteN: -20, siteRot: -54,
-  oaks: [[14, -17], [17.8, -22.3], [21.6, -27.6], [25.4, -32.9]] };
+  site: true, siteE: 0.2, siteN: 19.9, siteRot: 37,
+  oaks: [[14, 38], [20, 33], [23.5, 24], [27.5, 15]] };
 
 function examplePreset() {
   const items = [];
@@ -129,7 +129,7 @@ const MAT = {
   siteMain: new THREE.MeshStandardMaterial({ color: 0xbfb9ad, roughness: 0.9, transparent: true, opacity: 0.92 }),
   trunk: new THREE.MeshStandardMaterial({ color: 0x5b4636, roughness: 0.9 }),
   crown: new THREE.MeshStandardMaterial({ color: 0x4f7d3a, roughness: 0.95, transparent: true, opacity: 0.7 }),
-  oak: new THREE.MeshStandardMaterial({ color: 0x2f6b2f, roughness: 0.95, transparent: true, opacity: 0.9 }),
+  oak: new THREE.MeshStandardMaterial({ color: 0x35722f, roughness: 0.95, transparent: true, opacity: 0.55, depthWrite: false }),
   glass: new THREE.MeshPhysicalMaterial({ color: 0x9fc7e6, transparent: true, opacity: 0.35, roughness: 0.05, metalness: 0, side: THREE.DoubleSide }),
   frame: new THREE.MeshStandardMaterial({ color: 0x2b2f33, roughness: 0.6 }),
   door: new THREE.MeshStandardMaterial({ color: 0x3a5a40, roughness: 0.6 }),
@@ -175,7 +175,7 @@ const loods = new THREE.Group(); scene.add(loods);
 const building = new THREE.Group(); loods.add(building);
 const itemsGroup = new THREE.Group(); loods.add(itemsGroup);
 const site = new THREE.Group(); scene.add(site);
-let siteData = null, siteBuilt = false, orthoMesh = null; const oakMeshes = [];
+let siteData = null, siteBuilt = false, orthoMesh = null; const oakMeshes = [], dataTrees = [];
 scene.add(sun.target);
 let surfaces = { shell: [], back: null, front: null };
 let door = { group: null, cables: [], anchors: [], plateH: 0, plateW: 0, angle: 0 };
@@ -466,11 +466,12 @@ function buildSite() {
     if (b.name) { const cx = b.pts.reduce((a, p) => a + p[0], 0) / b.pts.length, cn = b.pts.reduce((a, p) => a + p[1], 0) / b.pts.length;
       const lab = textSprite(main ? 'Tolhuisweg 2 · Poortgebouw' : b.name, { width: main ? 5 : 3.2 }); lab.position.set(cx, b.h + 1.2, -cn); site.add(lab); }
   }
+  dataTrees.length = 0;
   for (const t of siteData.trees) {
     const g = new THREE.Group(); const h = t.h, cr = Math.max(1.2, h / 4);
     const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.12 + h / 60, 0.18 + h / 45, h * 0.45, 7), MAT.trunk); trunk.position.y = h * 0.225; g.add(trunk);
     const crown = new THREE.Mesh(new THREE.SphereGeometry(cr, 10, 8), MAT.crown); crown.position.y = h - cr * 0.9; crown.scale.y = 1.15; crown.castShadow = true; g.add(crown);
-    g.position.set(t.x, 0, -t.y); site.add(g);
+    g.position.set(t.x, 0, -t.y); site.add(g); dataTrees.push(g);
   }
   for (let i = 0; i < 4; i++) {
     const g = new THREE.Group(); const h = 17;
@@ -483,7 +484,11 @@ function buildSite() {
   const ref = textSprite('N', { width: 2.4, bold: true }); ref.position.set(0, 2, -60); site.add(ref);
   siteBuilt = true; placeOaks();
 }
-function placeOaks() { oakMeshes.forEach((g, i) => { const o = P().oaks[i]; if (o) g.position.set(o[0], 0, -o[1]); }); }
+function placeOaks() {
+  oakMeshes.forEach((g, i) => { const o = P().oaks[i]; if (o) g.position.set(o[0], 0, -o[1]); });
+  // een geregistreerde boom die onder een moeraseik valt, niet dubbel tekenen
+  for (const t of dataTrees) t.visible = !P().oaks.some(o => Math.hypot(t.position.x - o[0], t.position.z + o[1]) < 4.5);
+}
 
 // ---------------------------------------------------------------- items
 const itemMeshes = new Map();
@@ -707,9 +712,19 @@ function setCam(name) {
     kantoor: [[P().officeD + 2.6, 1.7, oz * 0.6], [0.8, 1.3, oz]],
     boven: [[L / 2, 24, 0.01], [L / 2, 0, 0]],
   };
-  views.terrein = [[-34, 26, 44], [L / 2, 0, 0]];
-  const [p, t] = views[name] || views.buiten;
+  views.terrein = [[-28, 22, -22], [L / 2, 1, 0]];
   loods.updateMatrixWorld(true);
+  if (name === 'boven') {
+    // recht van boven, noorden boven, ruim genoeg voor de loods en de vier eiken
+    const pts = [loods.localToWorld(new THREE.Vector3(0, 0, 0)), loods.localToWorld(new THREE.Vector3(L, 0, 0))];
+    if (P().site) for (const o of P().oaks) pts.push(new THREE.Vector3(o[0], 0, -o[1]));
+    const box = new THREE.Box3().setFromPoints(pts).expandByScalar(7);
+    const c = box.getCenter(new THREE.Vector3()), sz = box.getSize(new THREE.Vector3());
+    const span = Math.max(sz.x, sz.z, sz.x / camera.aspect);
+    const hgt = (span / 2) / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.1;
+    camera.position.set(c.x, hgt, c.z + 0.02); controls.target.set(c.x, 0, c.z); controls.update(); return;
+  }
+  const [p, t] = views[name] || views.buiten;
   camera.position.copy(loods.localToWorld(new THREE.Vector3(...p))); controls.target.copy(loods.localToWorld(new THREE.Vector3(...t))); controls.update();
 }
 
