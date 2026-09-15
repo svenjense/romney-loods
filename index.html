@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Romneyloods 6 × 13 m – 3D indeling</title>
+<style>
+  :root { --bg: rgba(255,255,255,.92); --ink: #1d232a; --line: #d6dbe1; --accent: #2d6a4f; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; color: var(--ink); background: #cfe3f5; }
+  #c { display: block; width: 100%; height: 100%; touch-action: none; }
+  #ui { position: fixed; top: 0; left: 0; bottom: 0; width: 320px; max-width: 100%; overflow-y: auto; background: var(--bg); backdrop-filter: blur(6px); border-right: 1px solid var(--line); padding: 10px 12px 40px; z-index: 5; }
+  #ui h1 { font-size: 16px; margin: 4px 0 10px; }
+  #ui h1 small { font-weight: 400; color: #5a6470; display: block; font-size: 12px; }
+  details { border-top: 1px solid var(--line); padding: 6px 0; }
+  summary { cursor: pointer; font-weight: 600; padding: 4px 0; user-select: none; }
+  .row { display: flex; align-items: center; gap: 8px; margin: 5px 0; flex-wrap: wrap; }
+  .row label { flex: 0 0 110px; color: #3b4652; }
+  .row input[type=range] { flex: 1; min-width: 80px; }
+  .row input[type=number], .row input[type=text], .row select { width: 70px; padding: 3px 5px; border: 1px solid var(--line); border-radius: 5px; font: inherit; }
+  .row input[type=text] { width: 120px; }
+  .row select { width: auto; }
+  .val { width: 44px; text-align: right; color: #5a6470; font-variant-numeric: tabular-nums; }
+  button { font: inherit; padding: 5px 9px; border: 1px solid var(--line); background: #fff; border-radius: 6px; cursor: pointer; }
+  button:hover { border-color: #9aa5b1; }
+  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  button.danger { color: #a4262c; }
+  .btns { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+  .legend { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; border: 1px solid rgba(0,0,0,.2); }
+  #sel { background: #f2f6f4; border: 1px solid #cfe0d6; border-radius: 8px; padding: 6px 8px; margin: 6px 0; }
+  #sel.empty { color: #6b7783; font-style: italic; background: transparent; border-color: transparent; padding: 2px 0; }
+  #hint { position: fixed; right: 10px; bottom: 10px; background: var(--bg); padding: 6px 10px; border-radius: 8px; font-size: 12px; color: #3b4652; z-index: 4; max-width: 60vw; }
+  #toggleUi { position: fixed; top: 10px; right: 10px; z-index: 6; display: none; }
+  .note { font-size: 12px; color: #5a6470; margin: 4px 0; }
+  @media (max-width: 720px) {
+    #ui { top: auto; width: 100%; height: 46vh; border-right: 0; border-top: 1px solid var(--line); }
+    #ui.hidden { display: none; }
+    #toggleUi { display: block; }
+    #hint { bottom: calc(46vh + 8px); }
+    body.ui-hidden #hint { bottom: 10px; }
+  }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<button id="toggleUi">Menu</button>
+<aside id="ui">
+  <h1>Romneyloods 6 × 13 m <small>Sleep panelen en meubels. Draai met één vinger, zoom met twee.</small></h1>
+
+  <details open>
+    <summary>Bekijk</summary>
+    <div class="btns">
+      <button data-cam="buiten">Buiten</button>
+      <button data-cam="binnen">Binnen</button>
+      <button data-cam="kantoor">Kantoor</button>
+      <button data-cam="boven">Boven</button>
+    </div>
+    <div class="row"><label>Dak doorzichtig</label><input type="range" id="opacity" min="0" max="100" value="100"><span class="val" id="opacityV">100%</span></div>
+    <div class="row"><label>Doorsnede</label><input type="range" id="clip" min="0" max="13" step="0.1" value="0"><span class="val" id="clipV">uit</span></div>
+  </details>
+
+  <details open>
+    <summary>Poort (takelplaat)</summary>
+    <div class="row"><label>Getakeld</label><input type="range" id="door" min="0" max="90" value="60"><span class="val" id="doorV">60°</span></div>
+    <div class="btns"><button data-door="0">Dicht</button><button data-door="45">Half</button><button data-door="90">Afdak</button></div>
+    <p class="note">Plaat scharniert boven, twee kabels naar de galg op de kopgevel. Omhoog = afdak en de ramen van het kantoor komen vrij.</p>
+  </details>
+
+  <details>
+    <summary>Loods</summary>
+    <div class="row"><label>Lengte</label><input type="range" id="length" min="6" max="24" step="0.5" value="13"><span class="val" id="lengthV">13 m</span></div>
+    <div class="row"><label>Breedte</label><input type="range" id="width" min="4" max="10" step="0.5" value="6"><span class="val" id="widthV">6 m</span></div>
+    <div class="row"><label>Rechte wand</label><input type="range" id="wallH" min="0" max="2" step="0.1" value="1"><span class="val" id="wallHV">1.0 m</span></div>
+    <p class="note">Nokhoogte = rechte wand + halve breedte.</p>
+  </details>
+
+  <details open>
+    <summary>Kantoor Joost & Sven (verwarmd)</summary>
+    <div class="row"><label>Kantoor</label><input type="checkbox" id="office" checked> <select id="officeSide"><option value="links">links</option><option value="rechts">rechts</option></select></div>
+    <div class="row"><label>Breedte</label><input type="range" id="officeW" min="2" max="5" step="0.1" value="3"><span class="val" id="officeWV">3.0 m</span></div>
+    <div class="row"><label>Diepte</label><input type="range" id="officeD" min="2" max="6" step="0.1" value="3.5"><span class="val" id="officeDV">3.5 m</span></div>
+    <div class="row"><label>Hoogte</label><input type="range" id="officeH" min="2.2" max="3" step="0.1" value="2.6"><span class="val" id="officeHV">2.6 m</span></div>
+  </details>
+
+  <details open>
+    <summary>Toevoegen</summary>
+    <div class="note">Aan de wand (sleep daarna naar de plek):</div>
+    <div class="btns">
+      <button data-panel="mycelium"><span class="legend" style="background:#e6dcc5"></span>Mycelium</button>
+      <button data-panel="bamboe"><span class="legend" style="background:#c9a165"></span>Bamboe</button>
+      <button data-panel="clt"><span class="legend" style="background:#d8b98a"></span>CLT</button>
+    </div>
+    <div class="note">Op de vloer:</div>
+    <div class="btns" id="floorBtns"></div>
+  </details>
+
+  <details open>
+    <summary>Geselecteerd</summary>
+    <div id="sel" class="empty">Tik op een paneel of meubel.</div>
+  </details>
+
+  <details>
+    <summary>Indelingen</summary>
+    <div class="row"><input type="text" id="layoutName" placeholder="naam"><button id="saveLayout">Bewaar</button></div>
+    <div class="row"><select id="layouts"></select><button id="loadLayout">Laad</button><button id="delLayout" class="danger">Wis</button></div>
+    <div class="btns">
+      <button id="share">Deel-link kopiëren</button>
+      <button id="export">Exporteer JSON</button>
+      <button id="import">Importeer JSON</button>
+      <button id="reset" class="danger">Terug naar voorbeeld</button>
+    </div>
+    <input type="file" id="importFile" accept="application/json" style="display:none">
+    <p class="note">Wordt automatisch bewaard in deze browser. Een deel-link bevat de hele indeling.</p>
+  </details>
+</aside>
+<div id="hint"></div>
+<script type="module" src="app.js"></script>
+</body>
+</html>
