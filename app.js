@@ -398,8 +398,8 @@ function buildOffice(z0, z1, side) {
   box(0.14, 0.05, rw, MAT.frame, D, 0.9, rz); box(0.14, 0.05, rw, MAT.frame, D, 2.2, rz);
   // isolatie tegen de loodswand (aangeduid als dikke wand)
   box(D, H, 0.16, MAT.plaster, D / 2, H / 2, zOut + (side < 0 ? 0.08 : -0.08));
-  // bureaus Joost en Sven, tegen de voorgevel (bij de ramen)
-  const desks = [[0.95, zc - W / 4 + 0.05, 'Joost'], [0.95, zc + W / 4 - 0.05, 'Sven']];
+  // bureaus Arnout en Sven, tegen de voorgevel (bij de ramen)
+  const desks = [[0.95, zc - W / 4 + 0.05, 'Arnout'], [0.95, zc + W / 4 - 0.05, 'Sven']];
   for (const [x, z, name] of desks) {
     box(0.7, 0.04, Math.min(1.4, W / 2 - 0.2), MAT.wood, x, 0.74, z);
     for (const [dx, dz] of [[-0.3, -0.55], [0.3, -0.55], [-0.3, 0.55], [0.3, 0.55]]) box(0.04, 0.72, 0.04, MAT.frame, x + dx, 0.36, z + dz * Math.min(1, (W / 2 - 0.2) / 1.4));
@@ -409,7 +409,7 @@ function buildOffice(z0, z1, side) {
   }
   // radiator = verwarmd
   box(0.08, 0.5, 0.9, MAT.radiator, D - 0.12, 0.35, side < 0 ? z0 + 0.6 : z1 - 0.6);
-  const lab = textSprite('kantoor Joost & Sven · verwarmd', { width: 2.6, bg: 'rgba(45,106,79,0.92)', color: '#fff' });
+  const lab = textSprite('kantoor Arnout & Sven · verwarmd', { width: 2.6, bg: 'rgba(45,106,79,0.92)', color: '#fff' });
   lab.position.set(D / 2, H + 0.5, zc); g.add(lab);
 }
 
