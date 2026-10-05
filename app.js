@@ -19,6 +19,8 @@ const FLOOR_TYPES = {
   bamboestaand: { label: 'Bamboepaneel vrijstaand', w: 1.2, d: 0.05, h: 2.4, tex: 'bamboe' },
   myceliumblok: { label: 'Myceliumblok', w: 0.6, d: 0.6, h: 0.6, tex: 'mycelium' },
   bus:          { label: 'Bestelbus', w: 2.0, d: 5.0, h: 2.2, color: 0xe8e8e8 },
+  persoon:      { label: 'Persoon', w: 0.5, d: 0.3, h: 1.75, color: 0x3d6b8c },
+  hond:         { label: 'Hond', w: 0.85, d: 0.3, h: 0.6, color: 0x8a5a2b },
 };
 const DEFAULT_PARAMS = { length: 13, width: 6, wallH: 1.0, door: 60, opacity: 100, clip: 0, lichtstraat: 1.2,
   office: true, officeW: 3.0, officeD: 3.5, officeH: 2.6, officeSide: 'links',
@@ -46,7 +48,43 @@ function examplePreset() {
   f('stelling', 11.6, 2.3, 0);
   f('tafel', 7.0, 0.6, 0);
   f('pallet', 4.2, 2.3, 0);
+  for (const it of crewItems(id)) items.push(it);
   return { params: { ...DEFAULT_PARAMS }, items };
+}
+
+// een paar mensen en een hond, voor de maat
+function crewItems(firstId) {
+  const f = (type, x, z, rot) => ({ kind: 'floor', type, x, z, rot, w: FLOOR_TYPES[type].w, d: FLOOR_TYPES[type].d, h: FLOOR_TYPES[type].h });
+  return [f('persoon', 11.8, -1.45, -Math.PI / 2), f('persoon', 7.0, 1.4, Math.PI / 2), f('persoon', 5.2, -0.6, 0.4), f('hond', 9.6, -0.6, 2.6)]
+    .map((it, i) => ({ id: firstId + i, ...it }));
+}
+const SHIRTS = [0x3d6b8c, 0xb5523b, 0x5f7f45, 0xd9a441, 0x6a4c7d];
+const SKIN = [0xe0b89a, 0xc69076, 0x8d5a3b, 0xf1cfb4];
+function personMesh(it, g) {
+  const n = it.id, m = (c, r = 0.8) => new THREE.MeshStandardMaterial({ color: c, roughness: r });
+  const shirt = m(SHIRTS[n % SHIRTS.length]), skin = m(SKIN[n % SKIN.length]), trousers = m(n % 2 ? 0x2b3440 : 0x4a4038), hair = m(n % 3 ? 0x3a2a1e : 0x9a7a52);
+  const add = (geo, mat, x, y, z) => { const o = new THREE.Mesh(geo, mat); o.position.set(x, y, z); g.add(o); return o; };
+  for (const s of [-1, 1]) {
+    add(new THREE.CylinderGeometry(0.065, 0.06, 0.82, 10), trousers, 0, 0.41, s * 0.09);
+    add(new THREE.BoxGeometry(0.24, 0.07, 0.11), m(0x222222), 0.04, 0.035, s * 0.09);
+    const arm = add(new THREE.CylinderGeometry(0.05, 0.045, 0.62, 8), shirt, 0, 1.18, s * 0.23); arm.rotation.x = s * 0.12;
+    add(new THREE.SphereGeometry(0.05, 8, 6), skin, 0, 0.86, s * 0.25);
+  }
+  add(new THREE.CapsuleGeometry(0.17, 0.42, 4, 12), shirt, 0, 1.12, 0).scale.set(0.75, 1, 1.15);
+  add(new THREE.CylinderGeometry(0.05, 0.05, 0.08, 8), skin, 0, 1.47, 0);
+  add(new THREE.SphereGeometry(0.115, 14, 10), skin, 0, 1.6, 0);
+  const h = add(new THREE.SphereGeometry(0.12, 14, 10, 0, Math.PI * 2, 0, Math.PI / 2), hair, -0.01, 1.62, 0); h.scale.set(1.02, 0.9, 1.02);
+}
+function dogMesh(it, g) {
+  const fur = new THREE.MeshStandardMaterial({ color: 0x8a5a2b, roughness: 0.9 }), dark = new THREE.MeshStandardMaterial({ color: 0x3a2516, roughness: 0.9 });
+  const add = (geo, mat, x, y, z) => { const o = new THREE.Mesh(geo, mat); o.position.set(x, y, z); g.add(o); return o; };
+  const body = add(new THREE.CapsuleGeometry(0.13, 0.42, 4, 12), fur, 0, 0.42, 0); body.rotation.z = Math.PI / 2;
+  for (const [x, z] of [[0.2, 0.08], [0.2, -0.08], [-0.2, 0.08], [-0.2, -0.08]]) add(new THREE.CylinderGeometry(0.035, 0.03, 0.34, 8), fur, x, 0.17, z);
+  add(new THREE.SphereGeometry(0.11, 12, 10), fur, 0.36, 0.6, 0);
+  add(new THREE.BoxGeometry(0.13, 0.08, 0.09), fur, 0.47, 0.57, 0);
+  add(new THREE.SphereGeometry(0.025, 8, 6), dark, 0.54, 0.59, 0);
+  for (const s of [-1, 1]) { const e = add(new THREE.BoxGeometry(0.05, 0.12, 0.04), dark, 0.33, 0.62, s * 0.08); e.rotation.x = s * 0.3; }
+  const tail = add(new THREE.CylinderGeometry(0.02, 0.03, 0.26, 6), fur, -0.38, 0.55, 0); tail.rotation.z = 0.7;
 }
 
 let state = null;
@@ -545,7 +583,10 @@ function makeMesh(it) {
     const t = FLOOR_TYPES[it.type];
     const mat = t.tex ? MAT[t.tex].clone() : new THREE.MeshStandardMaterial({ color: t.color, roughness: 0.7 });
     const g = new THREE.Group();
+    if (it.type === 'persoon') personMesh(it, g);
+    else if (it.type === 'hond') dogMesh(it, g);
     const body = new THREE.Mesh(new THREE.BoxGeometry(it.w, it.h, it.d), mat); body.position.y = it.h / 2;
+    if (it.type === 'persoon' || it.type === 'hond') { body.material.visible = false; body.material.depthWrite = false; } // onzichtbaar, wel om op te tikken
     body.castShadow = true; body.receiveShadow = true; g.add(body);
     if (it.type === 'stelling') { // planken aanduiden
       for (let k = 1; k < 4; k++) { const s = new THREE.Mesh(new THREE.BoxGeometry(it.w + 0.02, 0.03, it.d + 0.02), MAT.frame); s.position.y = (it.h * k) / 4; g.add(s); }
@@ -756,6 +797,8 @@ function applyState(s) {
     v: DEFAULT_PARAMS.v, siteE: DEFAULT_PARAMS.siteE, siteN: DEFAULT_PARAMS.siteN,
     siteRot: DEFAULT_PARAMS.siteRot, oaks: DEFAULT_PARAMS.oaks.map(o => [...o]),
   });
+  // opslag van voor de mensen en de hond: zet ze er één keer bij
+  if (!state.params.crew) { state.params.crew = 1; if (!state.items.some(i => i.type === 'persoon' || i.type === 'hond')) state.items.push(...crewItems(state.items.reduce((a, b) => Math.max(a, b.id), 0) + 1)); }
   selectedId = null; syncUI(); buildBuilding(); rebuildItems(); save();
 }
 function hint(t) { $('hint').textContent = t; }
