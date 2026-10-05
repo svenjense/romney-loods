@@ -762,14 +762,14 @@ function hint(t) { $('hint').textContent = t; }
 
 // ---------------------------------------------------------------- UI-koppeling
 const SLIDERS = [['length', v => `${v} m`], ['width', v => `${v} m`], ['wallH', v => `${(+v).toFixed(1)} m`], ['door', v => `${v}°`],
-  ['opacity', v => `${v}%`], ['clip', v => +v > 0 ? `${(+v).toFixed(1)} m` : 'uit'], ['officeW', v => `${(+v).toFixed(1)} m`],
-  ['officeD', v => `${(+v).toFixed(1)} m`], ['officeH', v => `${(+v).toFixed(1)} m`], ['lichtstraat', v => +v > 0.05 ? `${(+v).toFixed(1)} m` : 'uit'],
+  ['opacity', v => `${v}%`], ['clip', v => +v > 0 ? `${(+v).toFixed(1)} m` : 'uit'],
+  ['lichtstraat', v => +v > 0.05 ? `${(+v).toFixed(1)} m` : 'uit'],
   ['siteE', v => `${(+v).toFixed(1)} m`], ['siteN', v => `${(+v).toFixed(1)} m`], ['siteRot', v => `${v}°`]];
 const REBUILD = new Set(['length', 'width', 'wallH', 'officeW', 'officeD', 'officeH', 'lichtstraat']);
 const PLACE = new Set(['siteE', 'siteN', 'siteRot']);
 function syncUI() {
   for (const [k, f] of SLIDERS) { $(k).value = P()[k]; $(k + 'V').textContent = f(P()[k]); }
-  $('office').checked = P().office; $('officeSide').value = P().officeSide; $('site').checked = !!P().site;
+  $('site').checked = !!P().site;
   $('clip').max = P().length;
 }
 for (const [k, f] of SLIDERS) {
@@ -782,10 +782,8 @@ for (const [k, f] of SLIDERS) {
     save();
   });
 }
-$('office').addEventListener('change', () => { P().office = $('office').checked; buildBuilding(); save(); });
 $('site').addEventListener('change', () => { P().site = $('site').checked; applyPlacement(); setCam(P().site ? 'terrein' : 'buiten'); save(); });
 $('sitePreset').onclick = () => { Object.assign(P(), { site: true, siteE: DEFAULT_PARAMS.siteE, siteN: DEFAULT_PARAMS.siteN, siteRot: DEFAULT_PARAMS.siteRot, oaks: DEFAULT_PARAMS.oaks.map(o => [...o]) }); syncUI(); applyPlacement(); placeOaks(); setCam('terrein'); save(); };
-$('officeSide').addEventListener('change', () => { P().officeSide = $('officeSide').value; buildBuilding(); save(); });
 document.querySelectorAll('[data-cam]').forEach(b => b.onclick = () => setCam(b.dataset.cam));
 document.querySelectorAll('[data-door]').forEach(b => b.onclick = () => { P().door = +b.dataset.door; $('door').value = P().door; $('doorV').textContent = `${P().door}°`; save(); });
 document.querySelectorAll('[data-panel]').forEach(b => b.onclick = () => addPanel(b.dataset.panel));
